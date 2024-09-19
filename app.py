@@ -1,17 +1,21 @@
 from flask import Flask
-# הגבלת גישה לפי כמות בקשות
-from flask_limiter import Limiter
-# מחלק גישה לכל לקוח ולא כללי
-from flask_limiter.util import get_remote_address
+
+from blueprint.players_routes import players_bp
+from db import db
+from NBA_api.api import fetch_players
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db.init_app(app)
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+with app.app_context():
+    db.create_all()
+    fetch_players()
 
+app.register_blueprint(players_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
