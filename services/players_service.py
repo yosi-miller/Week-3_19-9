@@ -56,3 +56,38 @@ def create_new_team(team_name, players_id):
     db.session.commit()
 
     return new_team.id
+
+
+def update_team_in_db(team_id, player_ids):
+    """
+    Update the team in the database with new players.
+    :param team_id: The ID of the team to be updated.
+    :param player_ids: A list of new player IDs to be added to the team.
+    :return: A boolean indicating whether the update was successful.
+    """
+    try:
+        team = Team.query.filter_by(id=team_id).first()
+        if not team:
+            return False
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return False
+    else:
+        team.player1_id = player_ids[0]
+        team.player2_id = player_ids[1]
+        team.player3_id = player_ids[2]
+        team.player4_id = player_ids[3]
+        team.player5_id = player_ids[4]
+
+        db.session.commit()
+        return True
+
+def delete_team_from_db(team_id):
+    try:
+        Team.query.delete(team_id)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
