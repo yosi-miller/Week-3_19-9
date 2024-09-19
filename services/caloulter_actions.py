@@ -1,6 +1,6 @@
 def cal_atr():
-    pass
+    return 'need complete'
 
 
 def cal_ppg():
-    pass
+    return 'need complete'
