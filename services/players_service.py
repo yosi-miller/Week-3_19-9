@@ -13,10 +13,18 @@ def get_players_from_db(position, season=None):
         query = NBAPlayer.query.filter_by(position=position, season=season).all()
     else:
         query = NBAPlayer.query.filter_by(position=position).all()
-    result = [{'playerName': player.playerName, 'team': player.team, 'position': player.position,
-               'season': player.season, 'points': player.points, 'games': player.games,
-               'twoPercent': player.twoPercent, 'threePercent': player.threePercent,
-               'ATR': cal_atr(), 'PPG Ratio': cal_ppg()}
+
+    result = [{'playerName': player.playerName,
+               'team': player.team,
+               'position': player.position,
+               'season': player.season,
+               'points': player.points,
+               'games': player.games,
+               'twoPercent': player.twoPercent,
+               'threePercent': player.threePercent,
+               'ATR': cal_atr(),
+               'PPG Ratio': cal_ppg()}
+
                 for player in query]
     return result
 
@@ -70,7 +78,6 @@ def update_team_in_db(team_id, player_ids):
         if not team:
             return False
     except Exception as e:
-        print(e)
         db.session.rollback()
         return False
     else:
@@ -85,9 +92,60 @@ def update_team_in_db(team_id, player_ids):
 
 def delete_team_from_db(team_id):
     try:
-        Team.query.delete(team_id)
+        team_delete = Team.query.filter_by(id=team_id).first()
+        db.session.delete(team_delete)
         db.session.commit()
         return True
     except Exception as e:
         print(e)
         return False
+
+def generate_player(player_id):
+    player = NBAPlayer.query.filter_by(id=player_id).first()
+    if not player:
+        return {}
+
+    result = {'playerName': player.playerName,
+              'team': player.team,
+              'position': player.position,
+              'season': player.season,
+              'points': player.points,
+              'games': player.games,
+              'twoPercent': player.twoPercent,
+              'threePercent': player.threePercent,
+              'ATR': cal_atr(), 'PPG Ratio': cal_ppg()}
+    return result
+
+def get_team_from_db(team_id):
+    team = Team.query.filter_by(id=team_id).first()
+
+    if not team:
+        return False
+
+    result = {'teamName': team.teamName,
+              'player1_id': generate_player(team.player1_id),
+              'player2_id': generate_player(team.player2_id),
+              'player3_id': generate_player(team.player3_id),
+              'player4_id': generate_player(team.player4_id),
+              'player5_id': generate_player(team.player5_id)
+              }
+    return result
+
+
+def checks_teams_exists(team_ids):
+    """
+    checks_teams_exists
+    :param team_ids: list of team id
+    :return: boolean
+    """
+    for team_id in team_ids:
+        if not Team.query.filter_by(id=team_id).first():
+            return False
+    return True
+
+def compare_teams_by_ppg(team_1):
+    """
+    compare_teams_by_ppg
+    :param team_1: list of player id
+    :return: dict of compare teams
+    """
