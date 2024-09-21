@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from db import db
 from services.players_service import (
     get_players_from_db,
     get_players_position,
@@ -99,8 +98,7 @@ def get_team_details(team_id):
 
 @players_bp.route('/teams/compare', methods=['GET'])
 def compare_teams():
-    team_ids = request.args.getlist('team_id')
-    print(team_ids)
+    team_ids = request.args.to_dict().values()
 
     # Validate that at least 2 team IDs are provided
     if len(team_ids) < 2:

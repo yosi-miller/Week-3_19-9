@@ -1,6 +1,6 @@
 from models.mba_player_model import NBAPlayer
 from models.team import Team
-from services.caloulter_actions import cal_atr, cal_ppg
+from services.caloulter_actions import calculator_atr, calculator_ppg
 from db import db
 
 def get_players_from_db(position, season=None):
@@ -14,7 +14,7 @@ def get_players_from_db(position, season=None):
     else:
         query = NBAPlayer.query.filter_by(position=position).all()
 
-    result = [{'playerName': player.playerName,
+    result: list[dict] = [{'playerName': player.playerName,
                'team': player.team,
                'position': player.position,
                'season': player.season,
@@ -22,8 +22,8 @@ def get_players_from_db(position, season=None):
                'games': player.games,
                'twoPercent': player.twoPercent,
                'threePercent': player.threePercent,
-               'ATR': cal_atr(),
-               'PPG Ratio': cal_ppg()}
+               'ATR': calculator_atr(player.assists, player.turnovers),
+               'PPG Ratio': calculator_ppg()}
 
                 for player in query]
     return result
@@ -113,7 +113,8 @@ def generate_player(player_id):
               'games': player.games,
               'twoPercent': player.twoPercent,
               'threePercent': player.threePercent,
-              'ATR': cal_atr(), 'PPG Ratio': cal_ppg()}
+              'ATR': calculator_atr(player.assists, player.turnovers),
+              'PPG Ratio': calculator_ppg()}
     return result
 
 def get_team_from_db(team_id):
@@ -149,3 +150,4 @@ def compare_teams_by_ppg(team_1):
     :param team_1: list of player id
     :return: dict of compare teams
     """
+    pass
